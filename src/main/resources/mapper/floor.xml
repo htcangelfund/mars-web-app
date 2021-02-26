@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.itcd.angelfund.mars.connector.FloorDao">
+    <sql id="selectFloor">
+        <![CDATA[
+            select country, city, location, floor from room_info
+        ]]>
+    </sql>
+
+    <sql id="groupByOrderBy">
+        <![CDATA[
+            group by country, city, location, floor
+            order by country, city, location
+        ]]>
+    </sql>
+
+    <sql id="byId">
+        <![CDATA[
+            where floor = #{id}
+        ]]>
+    </sql>
+
+    <select id="getFloors" resultMap="floorsResultMap">
+        <include refid="selectFloor"/>
+        <include refid="groupByOrderBy"/>
+    </select>
+
+    <select id="getFloorById" parameterType="String" resultMap="floorsResultMap">
+        <include refid="selectFloor"/>
+        <include refid="byId"/>
+        <include refid="groupByOrderBy"/>
+    </select>
+
+    <resultMap id="floorsResultMap" type="FloorDetail">
+        <id column="country" property="country"/>
+        <id column="city" property="city"/>
+        <id column="location" property="location"/>
+        <id column="floor" property="floor"/>
+    </resultMap>
+</mapper>

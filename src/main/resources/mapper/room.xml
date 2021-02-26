@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.itcd.angelfund.mars.connector.RoomDao">
+    <sql id="getRoomsCurrentStatus">
+        <![CDATA[
+            select
+                room.id as room_id, country, city, location, floor, name, remark, room.update_timestamp as room_update_timestamp,
+                history.id as history_id, history.status, history.update_timestamp as status_update_timestamp
+            from room_info room
+            join (
+                select  id, room_id, status, update_timestamp from room_status_history history
+                where id in (
+                    select max(id) from room_status_history group by room_id
+                )
+              ) history
+            on room.id = history.room_id
+        ]]>
+    </sql>
+
+    <sql id="orderBy">
+        <![CDATA[
+            order by room.floor asc, room.name asc
+        ]]>
+    </sql>
+
+    <sql id="selectRoom">
+        <![CDATA[
+            select
+                room.id as room_id, country, city, location, floor, name, remark, room.update_timestamp as room_update_timestamp
+            from room_info room
+        ]]>
+    </sql>
+
+    <select id="getRoomById" parameterType="Integer" resultMap="roomResultMap">
+        <include refid="selectRoom"></include>
+        <![CDATA[
+            where room.id = #{roomId}
+        ]]>
+    </select>
+
+    <insert id="createRoomStatus" parameterType="RoomStatus">
+        <![CDATA[
+            insert into room_status_history (`room_id`, `status`)
+                values (#{roomId}, #{status})
+        ]]>
+    </insert>
+
+    <select id="getRoomsWithCurrentStatus" resultMap="roomCurrentStatusResultMap">
+        <include refid="getRoomsCurrentStatus"/>
+        <include refid="orderBy"></include>
+    </select>
+
+    <select id="getRoomsGroupByFloor" resultMap="roomsByFloorResultMap">
+        <include refid="getRoomsCurrentStatus"/>
+        <include refid="orderBy"></include>
+    </select>
+
+    <select id="getRoomsWithCurrentStatusGroupByFloor" parameterType="String" resultMap="roomsByFloorResultMap">
+        <include refid="getRoomsCurrentStatus"/>
+        <![CDATA[
+            where room.floor = #{floorId}
+        ]]>
+        <include refid="orderBy"></include>
+    </select>
+
+    <select id="getRoomsWithCurrentStatusGroupByLocation" parameterType="String" resultMap="roomsByLocationResultMap">
+        <include refid="getRoomsCurrentStatus"/>
+        <![CDATA[
+            where room.location = #{locationId}
+        ]]>
+        <include refid="orderBy"></include>
+    </select>
+
+    <select id="getRoomCurrentStatusById" parameterType="Integer" resultMap="roomCurrentStatusResultMap">
+        <include refid="getRoomsCurrentStatus"/>
+        <![CDATA[
+            where room.id = #{roomId}
+        ]]>
+        <include refid="orderBy"></include>
+    </select>
+
+    <select id="getRoomWithHistoricalStatusByRoomId" resultMap="roomStatusListResultMap">
+        <![CDATA[
+            select
+                room.id as room_id, country, city, location, floor, name, remark, room.update_timestamp as room_update_timestamp,
+                history.id as history_id, history.status, history.update_timestamp as status_update_timestamp
+            from room_info room
+            join (select id, room_id, status, update_timestamp from room_status_history
+                      where update_timestamp between #{localDateTimeRangeParam.from} and #{localDateTimeRangeParam.to}) history
+            on room.id = history.room_id
+            where room.id = #{roomId}
+            order by room.floor asc, room.name asc, history.id asc
+        ]]>
+    </select>
+
+    <resultMap id="roomResultMap" type="RoomInfo">
+        <id property="id" column="room_id"/>
+        <result property="country" column="country"/>
+        <result property="city" column="city"/>
+        <result property="location" column="location"/>
+        <result property="floor" column="floor"/>
+        <result property="name" column="name"/>
+        <result property="remark" column="remark"/>
+        <result property="updateTimestamp" column="room_update_timestamp" jdbcType="TIMESTAMP" typeHandler="org.apache.ibatis.type.LocalDateTimeTypeHandler"/>
+    </resultMap>
+
+    <resultMap id="roomStatusResultMap" type="RoomStatus">
+        <id property="id" column="history_id"/>
+        <result property="roomId" column="room_id"/>
+        <result property="status" column="status" jdbcType="VARCHAR" typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="updateTimestamp" column="status_update_timestamp" jdbcType="TIMESTAMP" typeHandler="org.apache.ibatis.type.LocalDateTimeTypeHandler"/>
+    </resultMap>
+
+    <resultMap id="roomCurrentStatusResultMap" type="RoomCurrentStatus">
+        <id column="room_id"/>
+        <association property="room" resultMap="roomResultMap" />
+        <association property="currentStatus" resultMap="roomStatusResultMap" />
+    </resultMap>
+
+    <resultMap id="roomStatusListResultMap" type="RoomHistoricalStatus">
+        <id column="room_id"/>
+        <association property="room" resultMap="roomResultMap" />
+        <collection property="roomStatusList" javaType="java.util.ArrayList" ofType="RoomStatus" resultMap="roomStatusResultMap" />
+    </resultMap>
+
+    <resultMap id="roomsByFloorResultMap" type="FloorDetail">
+        <id column="country" property="country"/>
+        <id column="city" property="city"/>
+        <id column="location" property="location"/>
+        <id column="floor" property="floor"/>
+        <collection property="rooms" javaType="java.util.ArrayList" ofType="RoomCurrentStatus" resultMap="roomCurrentStatusResultMap"/>
+    </resultMap>
+
+    <resultMap id="roomsByLocationResultMap" type="LocationDetail">
+        <id column="country" property="country"/>
+        <id column="city" property="city"/>
+        <id column="location" property="location"/>
+        <collection property="rooms" javaType="java.util.ArrayList" ofType="RoomCurrentStatus" resultMap="roomCurrentStatusResultMap"/>
+    </resultMap>
+</mapper>

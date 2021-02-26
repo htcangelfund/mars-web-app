@@ -1,0 +1,5 @@
+server:
+  port: 8090
+mybatis:
+  type-aliases-package: com.itcd.angelfund.mars.model
+  mapper-locations: classpath:mapper/*.xml

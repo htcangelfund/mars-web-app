@@ -1,0 +1,22 @@
+# Deployment Scripts:
+
+# step 1, upload the package to VM
+scp ./target/bootiful-APIs-1.10-SNAPSHOT.jar root@139.224.70.36:/opt/installable
+
+# step2,
+ssh root@139.224.70.36
+mv -f /opt/installable/bootiful-APIs-1.10-SNAPSHOT.jar /opt/mars-apis
+chmod 755 /opt/mars-apis/bootiful-APIs-1.10-SNAPSHOT.jar
+cd /opt/mars-apis/
+rm -f latest.jar
+ln -s bootiful-APIs-1.10-SNAPSHOT.jar latest.jar
+systemctl restart mars.service
+
+
+
+#Data base connections on ECS
+mysql -h rm-uf624vay34448bg30.mysql.rds.aliyuncs.com -P 3306 -u mars_rw_acc1 -p
+show database;
+use mars-rds-instance1;
+select * from room_status_history order by update_timestamp desc limit 10;
+select * from room_status_history where status = 'OCCUPIED' order by update_timestamp desc limit 10;

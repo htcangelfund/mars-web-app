@@ -1,0 +1,369 @@
+{
+	"info": {
+		"_postman_id": "47142d4a-9aa4-493d-9e17-0b07dfc97c9c",
+		"name": "MARS-Collection",
+		"description": "APIs for MARS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Get room information by room id",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://139.224.70.36:8443/rooms/3",
+					"protocol": "http",
+					"host": [
+						"139",
+						"224",
+						"70",
+						"36"
+					],
+					"port": "8443",
+					"path": [
+						"rooms",
+						"3"
+					]
+				},
+				"description": "Get room base information.\nStatus: 200 OK or 404 Not Found\nThe 200 response includes the following fields:\nInteger id;\nString country;\nString city;\nString location;\nString floor;\nString name;\nString remark;\nLocalDateTime updateTimestamp;"
+			},
+			"response": []
+		},
+		{
+			"name": "1.5 Get room current status by room id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://139.224.70.36:8443/rooms/2/status",
+					"protocol": "http",
+					"host": [
+						"139",
+						"224",
+						"70",
+						"36"
+					],
+					"port": "8443",
+					"path": [
+						"rooms",
+						"2",
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2. Update room status to available",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "0"
+				},
+				"url": {
+					"raw": "http://139.224.70.36:8443/rooms/3/status",
+					"protocol": "http",
+					"host": [
+						"139",
+						"224",
+						"70",
+						"36"
+					],
+					"port": "8443",
+					"path": [
+						"rooms",
+						"3",
+						"status"
+					]
+				},
+				"description": "Update room status,\nResponse 201 Created: new status is created\nResponse 400 Bad Request: room status update failed"
+			},
+			"response": []
+		},
+		{
+			"name": "3. Update room status to occupied",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "1"
+				},
+				"url": {
+					"raw": "http://139.224.70.36:8443/rooms/3/status",
+					"protocol": "http",
+					"host": [
+						"139",
+						"224",
+						"70",
+						"36"
+					],
+					"port": "8443",
+					"path": [
+						"rooms",
+						"3",
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4. Get all rooms' current status",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://139.224.70.36:8443/rooms/status",
+					"protocol": "http",
+					"host": [
+						"139",
+						"224",
+						"70",
+						"36"
+					],
+					"port": "8443",
+					"path": [
+						"rooms",
+						"status"
+					]
+				},
+				"description": "200 OK\n204 No Content"
+			},
+			"response": []
+		},
+		{
+			"name": "5. Get all room's historical status list",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://139.224.70.36:8443/rooms/status/history",
+					"protocol": "http",
+					"host": [
+						"139",
+						"224",
+						"70",
+						"36"
+					],
+					"port": "8443",
+					"path": [
+						"rooms",
+						"status",
+						"history"
+					],
+					"query": [
+						{
+							"key": "fromDate",
+							"value": "2020-01-20",
+							"disabled": true
+						},
+						{
+							"key": "formTime",
+							"value": "00:00:00",
+							"disabled": true
+						},
+						{
+							"key": "toDate",
+							"value": "2020-01-21",
+							"disabled": true
+						},
+						{
+							"key": "toTime",
+							"value": "23:59:59",
+							"disabled": true
+						}
+					]
+				},
+				"description": "200 OK\n204 No Content\n\nQuery parameters are all optional.\nfromTime default value: 00:00:00\ntoTime default value： 23:59:59.99999\n\nfromDate && toDate are both null: [today-1 day， today]\nfromDate is null，toDate is provided: [toDate-1 day， toDate]\nfromDate is provided，toDate is null，[fromDate, fromDate+1 day]"
+			},
+			"response": []
+		},
+		{
+			"name": "6. Get all room's utilize rate with distinct status list",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://139.224.70.36:8443/rooms/status/report",
+					"protocol": "http",
+					"host": [
+						"139",
+						"224",
+						"70",
+						"36"
+					],
+					"port": "8443",
+					"path": [
+						"rooms",
+						"status",
+						"report"
+					],
+					"query": [
+						{
+							"key": "fromDate",
+							"value": "2020-01-20",
+							"disabled": true
+						},
+						{
+							"key": "formTime",
+							"value": "00:00:00",
+							"disabled": true
+						},
+						{
+							"key": "toDate",
+							"value": "2020-01-21",
+							"disabled": true
+						},
+						{
+							"key": "toTime",
+							"value": "23:59:59",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "7. Get all rooms's current status grouped by floor",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://139.224.70.36:8443/floors",
+					"protocol": "http",
+					"host": [
+						"139",
+						"224",
+						"70",
+						"36"
+					],
+					"port": "8443",
+					"path": [
+						"floors"
+					]
+				},
+				"description": "200 OK\n204 No Content"
+			},
+			"response": []
+		},
+		{
+			"name": "8. Get all floors",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://139.224.70.36:8443/floors/summary",
+					"protocol": "http",
+					"host": [
+						"139",
+						"224",
+						"70",
+						"36"
+					],
+					"port": "8443",
+					"path": [
+						"floors",
+						"summary"
+					]
+				},
+				"description": "Get all floors"
+			},
+			"response": []
+		},
+		{
+			"name": "9. Get rooms of floor",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://139.224.70.36:8443/floors/25F/rooms",
+					"protocol": "http",
+					"host": [
+						"139",
+						"224",
+						"70",
+						"36"
+					],
+					"port": "8443",
+					"path": [
+						"floors",
+						"25F",
+						"rooms"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "10. Get room status report by room id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://139.224.70.36:8443/rooms/2/status/report",
+					"protocol": "http",
+					"host": [
+						"139",
+						"224",
+						"70",
+						"36"
+					],
+					"port": "8443",
+					"path": [
+						"rooms",
+						"2",
+						"status",
+						"report"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
